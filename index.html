@@ -1,0 +1,951 @@
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nhìn về Hồ Gươm</title>
+
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, sans-serif;
+}
+
+
+button {
+    font-family: inherit;
+}
+
+
+/* ===== TRANG CHÍNH ===== */
+
+
+.main-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #a60e08;
+    overflow: hidden;
+}
+
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+}
+
+
+/* ===== HOTSPOT ===== */
+
+
+.hotspot {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #d71919;
+    border: 2.5px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    animation: hotspotPulse 1.6s ease-in-out infinite;
+    transition: box-shadow .2s ease;
+}
+
+
+.hotspot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border: 2px solid rgba(255,255,255,.75);
+    border-radius: 50%;
+    animation: hotspotRipple 1.6s ease-out infinite;
+    pointer-events: none;
+}
+
+
+.hotspot:hover {
+    background: #ff3028;
+    box-shadow: 0 4px 14px rgba(0,0,0,.55),
+                0 0 0 3px rgba(255,255,255,.35);
+}
+
+
+.hand {
+    color: white;
+    font-size: 20px;
+    line-height: 1;
+    transform: translateY(-1px);
+}
+
+
+@keyframes hotspotPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+
+@keyframes hotspotRipple {
+    0% { transform: scale(.9); opacity: .8; }
+    70%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
+
+.hotspot-1 {
+    left: 26.5%;
+    top: 14%;
+}
+
+
+.hotspot-2 {
+    left: 35%;
+    top: 28%;
+}
+
+
+.hotspot-3 {
+    left: 37.3%;
+    top: 57.9%;
+}
+
+
+.hotspot-4 {
+    left: 35.5%;
+    top: 65.8%;
+}
+
+.hotspot-5 {
+    left: 34.8%;
+    top: 78%;
+}
+
+/* ===== BOX ÂM THANH ===== */
+
+
+.audio-player {
+    position: absolute;
+    left: 77.5%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+
+
+    width: 260px;
+    height: 76px;
+    padding: 6px 9px;
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+
+    background: #a60e08;
+    border: 4px solid #fff;
+    color: #fff;
+    z-index: 15;
+
+
+    transition: background .25s ease, box-shadow .25s ease;
+}
+
+
+.audio-player:hover {
+    background: #bd1710;
+    box-shadow: 0 0 12px rgba(255,220,150,.45);
+}
+
+
+/* NÚT PHÁT / TẠM DỪNG */
+
+
+.audio-toggle {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+
+
+    border: none;
+    border-radius: 50%;
+    background: #ffcc65;
+    color: #a60e08;
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+.audio-toggle:hover {
+    background: #fff0b4;
+}
+
+
+/* VÙNG SÓNG ÂM CÓ THỂ TUA */
+
+
+.audio-wave {
+    position: relative;
+    height: 48px;
+    flex: 1;
+    min-width: 0;
+
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 3px;
+
+
+    padding-top: 5px;
+    padding-bottom: 17px;
+
+
+    overflow: hidden;
+    cursor: pointer;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+
+.audio-wave:focus-visible {
+    outline: 1px solid #fff0b4;
+    outline-offset: 2px;
+}
+
+
+/* VẠCH SÓNG ÂM */
+
+
+.audio-wave > span {
+    position: relative;
+    z-index: 1;
+
+
+    display: block;
+    flex: 1;
+    min-width: 2px;
+    max-width: 4px;
+    height: var(--bar-height, 8px);
+
+
+    background: #ffcf73;
+    border-radius: 2px;
+    opacity: .65;
+
+
+    pointer-events: none;
+    transition: background .1s ease;
+}
+
+
+/* PHẦN TIẾN TRÌNH ĐÃ PHÁT */
+
+
+.audio-wave::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 15px;
+    left: 0;
+    width: var(--progress, 0%);
+
+
+    background: rgba(255,204,101,.2);
+    border-right: 2px solid #fff0b4;
+
+
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+.audio-wave > span.played {
+    opacity: 1;
+    background: #fff0b4;
+}
+
+
+/* THỜI GIAN */
+
+
+.audio-time {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+
+
+    color: #fff0b4;
+    font-size: 9px;
+    line-height: 12px;
+    white-space: nowrap;
+
+
+    pointer-events: none;
+}
+
+
+/* ===== POPUP ===== */
+
+
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.58);
+
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+
+    z-index: 1000;
+    padding: 40px;
+}
+
+
+.popup-overlay.active {
+    display: flex;
+}
+
+
+.popup {
+    position: relative;
+    width: 82vw;
+    height: 82vh;
+    max-width: 1250px;
+    max-height: 850px;
+
+
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+
+
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+}
+
+
+.close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+
+
+    background: rgba(0,0,0,.72);
+    color: white;
+
+
+    font-size: 30px;
+    line-height: 38px;
+    cursor: pointer;
+    z-index: 1100;
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+    transition: .2s ease;
+}
+
+
+.close-button:hover {
+    background: #c91515;
+    transform: scale(1.08);
+}
+
+
+#contentFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: white;
+}
+
+
+/* ===== RESPONSIVE ===== */
+
+
+@media (max-width: 800px) {
+    .hotspot {
+        width: 30px;
+        height: 30px;
+        border-width: 2px;
+    }
+
+
+    .hand {
+        font-size: 17px;
+    }
+
+
+    .audio-player {
+        width: 190px;
+        height: 57px;
+        gap: 6px;
+        padding: 4px 6px;
+        border-width: 2px;
+    }
+
+
+    .audio-toggle {
+        flex-basis: 23px;
+        width: 23px;
+        height: 23px;
+        font-size: 11px;
+    }
+
+
+    .audio-wave {
+        height: 42px;
+        gap: 2px;
+        padding-top: 4px;
+        padding-bottom: 15px;
+    }
+
+
+    .audio-wave > span {
+        min-width: 1px;
+    }
+
+
+    .audio-wave::before {
+        bottom: 13px;
+    }
+
+
+    .audio-time {
+        font-size: 8px;
+        line-height: 11px;
+    }
+
+
+    .popup-overlay {
+        padding: 15px;
+    }
+
+
+    .popup {
+        width: 94vw;
+        height: 90vh;
+        border-radius: 8px;
+    }
+
+
+    .close-button {
+        width: 36px;
+        height: 36px;
+        font-size: 25px;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .hotspot,
+    .hotspot::after {
+        animation: none;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ===== TRANG CHÍNH ===== -->
+
+
+<div class="main-container">
+    <div class="map-wrapper">
+
+
+        <img
+            src="cuoi.png"
+            class="main-image"
+            alt="Nhìn về Hồ Gươm"
+        >
+
+
+        <!-- ===== BOX ÂM THANH ===== -->
+
+
+        <div class="audio-player" id="audioPlayer">
+
+
+            <button
+                type="button"
+                class="audio-toggle"
+                id="audioToggle"
+                aria-label="Phát âm thanh">
+                ▶
+            </button>
+
+
+            <div
+                class="audio-wave"
+                id="audioWave"
+                role="slider"
+                tabindex="0"
+                aria-label="Tua âm thanh"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0">
+
+
+                <span style="--bar-height:7px"></span>
+                <span style="--bar-height:12px"></span>
+                <span style="--bar-height:17px"></span>
+                <span style="--bar-height:10px"></span>
+                <span style="--bar-height:20px"></span>
+                <span style="--bar-height:13px"></span>
+                <span style="--bar-height:8px"></span>
+                <span style="--bar-height:18px"></span>
+                <span style="--bar-height:11px"></span>
+                <span style="--bar-height:22px"></span>
+                <span style="--bar-height:14px"></span>
+                <span style="--bar-height:9px"></span>
+                <span style="--bar-height:17px"></span>
+                <span style="--bar-height:12px"></span>
+                <span style="--bar-height:20px"></span>
+                <span style="--bar-height:8px"></span>
+                <span style="--bar-height:15px"></span>
+                <span style="--bar-height:11px"></span>
+                <span style="--bar-height:18px"></span>
+                <span style="--bar-height:7px"></span>
+
+
+                <div class="audio-time">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- FILE ÂM THANH: ĐẶT CÙNG THƯ MỤC -->
+        <audio id="hoGuomAudio" preload="metadata">
+            <source src="ho-guom.MP3" type="audio/mpeg">
+        </audio>
+
+
+        <!-- ===== HOTSPOT 1 ===== -->
+
+
+        <button
+            class="hotspot hotspot-1"
+            onclick="openPopup('https://ltq11-ta.github.io/bieutuongkhaihoanmon/')"
+            aria-label="Hotspot 1">
+            <span class="hand">☝</span>
+        </button>
+
+
+        <!-- ===== HOTSPOT 2 ===== -->
+
+
+        <button
+            class="hotspot hotspot-2"
+            onclick="openPopup('https://ltq11-ta.github.io/tongthevatuongdaiquyettu/')"
+            aria-label="Hotspot 2">
+            <span class="hand">☝</span>
+        </button>
+
+
+        <!-- ===== HOTSPOT 3 ===== -->
+
+
+        <button
+            class="hotspot hotspot-3"
+            onclick="openPopup('https://ltq11-ta.github.io/quangtruongthoidai/')"
+            aria-label="Hotspot 3">
+            <span class="hand">☝</span>
+        </button>
+
+
+        <!-- ===== HOTSPOT 4 ===== -->
+
+
+        <button
+            class="hotspot hotspot-4"
+            onclick="openPopup('https://ltq11-ta.github.io/quangtruongthoidai/')"
+            aria-label="Hotspot 4">
+            <span class="hand">☝</span>
+        </button>
+
+        <!-- ===== HOTSPOT 5 ===== -->
+         
+        <button
+            class="hotspot hotspot-5"
+            onclick="openPopup('https://ltq11-ta.github.io/buudienhientaivatuonglai/')"
+            aria-label="Hotspot 5">
+        <span class="hand">☝</span>
+        </button>
+
+    </div>
+</div>
+
+
+<!-- ===== POPUP NỘI DUNG HOTSPOT ===== -->
+
+
+<div
+    class="popup-overlay"
+    id="popupOverlay"
+    onclick="closeOutside(event)">
+
+
+    <div class="popup">
+
+
+        <button
+            class="close-button"
+            onclick="closePopup()"
+            aria-label="Đóng">
+            ×
+        </button>
+
+
+        <iframe
+            id="contentFrame"
+            src=""
+            title="Nội dung địa điểm"
+            allowfullscreen>
+        </iframe>
+
+
+    </div>
+</div>
+
+
+<script>
+/* ===== MỞ POPUP HOTSPOT ===== */
+
+
+function openPopup(url) {
+    const overlay = document.getElementById("popupOverlay");
+    const frame = document.getElementById("contentFrame");
+
+
+    frame.src = url;
+    overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+
+/* ===== ĐÓNG POPUP ===== */
+
+
+function closePopup() {
+    const overlay = document.getElementById("popupOverlay");
+    const frame = document.getElementById("contentFrame");
+
+
+    frame.src = "";
+    overlay.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+
+function closeOutside(event) {
+    if (event.target === document.getElementById("popupOverlay")) {
+        closePopup();
+    }
+}
+
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closePopup();
+    }
+});
+
+
+/* ===== ĐIỀU KHIỂN ÂM THANH ===== */
+
+
+const audioToggle = document.getElementById("audioToggle");
+const audioWave = document.getElementById("audioWave");
+const hoGuomAudio = document.getElementById("hoGuomAudio");
+
+
+const currentTimeLabel = document.getElementById("currentTime");
+const durationLabel = document.getElementById("duration");
+
+
+const waveBars = audioWave.querySelectorAll(":scope > span");
+
+
+function formatTime(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+        return "0:00";
+    }
+
+
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+
+
+    return minutes + ":" + String(secs).padStart(2, "0");
+}
+
+
+/* Cập nhật tiến trình và thời gian */
+
+
+function updateProgress() {
+    const duration = hoGuomAudio.duration;
+    const current = hoGuomAudio.currentTime;
+
+
+    currentTimeLabel.textContent = formatTime(current);
+
+
+    if (!Number.isFinite(duration) || duration <= 0) {
+        durationLabel.textContent = "0:00";
+        audioWave.style.setProperty("--progress", "0%");
+        audioWave.setAttribute("aria-valuenow", "0");
+        return;
+    }
+
+
+    durationLabel.textContent = formatTime(duration);
+
+
+    const progress = Math.min(100, (current / duration) * 100);
+
+
+    audioWave.style.setProperty("--progress", progress + "%");
+    audioWave.setAttribute("aria-valuenow", String(Math.round(progress)));
+
+
+    const playedBars = Math.round(
+        (current / duration) * waveBars.length
+    );
+
+
+    waveBars.forEach(function(bar, index) {
+        bar.classList.toggle("played", index < playedBars);
+    });
+}
+
+
+/* Đổi biểu tượng phát / tạm dừng */
+
+
+function updateAudioButton(isPlaying) {
+    audioToggle.textContent = isPlaying ? "Ⅱ" : "▶";
+
+
+    audioToggle.setAttribute(
+        "aria-label",
+        isPlaying ? "Tạm dừng âm thanh" : "Phát âm thanh"
+    );
+}
+
+
+/* Bấm nút để phát hoặc tạm dừng */
+
+
+audioToggle.addEventListener("click", async function() {
+    if (hoGuomAudio.paused) {
+        try {
+            await hoGuomAudio.play();
+        } catch (error) {
+            console.error("Không thể phát âm thanh:", error);
+            alert(
+                "Không phát được âm thanh. Hãy kiểm tra file ho-guom.MP3."
+            );
+        }
+    } else {
+        hoGuomAudio.pause();
+    }
+});
+
+
+/* Bấm hoặc kéo dải sóng để tua */
+
+
+function seekAudio(event) {
+    const duration = hoGuomAudio.duration;
+
+
+    if (!Number.isFinite(duration) || duration <= 0) {
+        return;
+    }
+
+
+    const rect = audioWave.getBoundingClientRect();
+
+
+    const x = Math.max(
+        0,
+        Math.min(rect.width, event.clientX - rect.left)
+    );
+
+
+    hoGuomAudio.currentTime = (x / rect.width) * duration;
+    updateProgress();
+}
+
+
+let isSeeking = false;
+
+
+audioWave.addEventListener("pointerdown", function(event) {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+    }
+
+
+    isSeeking = true;
+    audioWave.setPointerCapture(event.pointerId);
+    seekAudio(event);
+});
+
+
+audioWave.addEventListener("pointermove", function(event) {
+    if (isSeeking) {
+        seekAudio(event);
+    }
+});
+
+
+function stopSeeking() {
+    isSeeking = false;
+}
+
+
+audioWave.addEventListener("pointerup", stopSeeking);
+audioWave.addEventListener("pointercancel", stopSeeking);
+
+
+/* Hỗ trợ tua bằng bàn phím */
+
+
+audioWave.addEventListener("keydown", function(event) {
+    const duration = hoGuomAudio.duration;
+
+
+    if (!Number.isFinite(duration) || duration <= 0) {
+        return;
+    }
+
+
+    if (event.key === "ArrowRight") {
+        event.preventDefault();
+        hoGuomAudio.currentTime = Math.min(
+            duration,
+            hoGuomAudio.currentTime + 5
+        );
+    } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        hoGuomAudio.currentTime = Math.max(
+            0,
+            hoGuomAudio.currentTime - 5
+        );
+    } else if (event.key === "Home") {
+        event.preventDefault();
+        hoGuomAudio.currentTime = 0;
+    } else if (event.key === "End") {
+        event.preventDefault();
+        hoGuomAudio.currentTime = duration;
+    } else {
+        return;
+    }
+
+
+    updateProgress();
+});
+
+
+/* Đồng bộ với file âm thanh */
+
+
+hoGuomAudio.addEventListener("loadedmetadata", updateProgress);
+hoGuomAudio.addEventListener("durationchange", updateProgress);
+hoGuomAudio.addEventListener("timeupdate", updateProgress);
+hoGuomAudio.addEventListener("seeked", updateProgress);
+
+
+hoGuomAudio.addEventListener("play", function() {
+    updateAudioButton(true);
+});
+
+
+hoGuomAudio.addEventListener("pause", function() {
+    updateAudioButton(false);
+});
+
+
+hoGuomAudio.addEventListener("ended", function() {
+    updateAudioButton(false);
+    updateProgress();
+});
+
+
+hoGuomAudio.addEventListener("error", function() {
+    console.error("Không tải được file âm thanh ho-guom.MP3");
+});
+
+
+updateProgress();
+</script>
+
+
+</body>
+</html>
+
+
+
